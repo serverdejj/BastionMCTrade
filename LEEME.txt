@@ -1,0 +1,23 @@
+BASTION MC - BastionMCTrade 1.0.0
+Servidor: Purpur/Paper 1.21.11, Java 21.
+
+INSTALACION
+1. Sube los archivos de esta carpeta a la raiz de un repositorio de GitHub.
+2. GitHub Actions -> compilacion verde -> Artifacts -> BastionMCTrade-JAR.
+3. Extrae el .jar y colocalo en plugins/; reinicia el servidor.
+4. Para ofrecer dinero necesitas Vault Y un plugin de economia compatible (Vault por si solo no guarda saldos).
+
+USO
+- Shift + clic derecho sobre otro jugador a menos de 5 bloques.
+- Invitacion clicable: /trade accept o /trade deny (caduca en 30 s).
+- Menu 54 espacios: lado izquierdo = tu oferta; derecho = oferta del otro.
+- Inserta un objeto con el cursor en tu lado o Shift+clic en tu inventario.
+- Retira un objeto de tu lado con el cursor vacio.
+- Oro = editar dinero (+/- 10, 100, 1000) en un menu separado.
+- Verde = aceptar; rojo = cancelar; ambos aceptan -> contador 5 s en menu.
+
+NOTAS DE SEGURIDAD
+- En cancelaciones, si no hay espacio los objetos sobrantes caeran al suelo cerca del jugador.
+- No admite swaps directos o arrastre en los slots; estos se bloquean deliberadamente.
+- Primer prototipo: prueba en un servidor de pruebas, especialmente la economia y desconexiones.
+- Ante reinicios bruscos/crashes o errores del proveedor economico, no puede garantizarse la atomicidad. Guarda respaldos y no uses inicialmente con objetos valiosos.

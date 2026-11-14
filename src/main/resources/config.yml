@@ -1,0 +1,6 @@
+request-seconds: 30
+max-distance: 5.0
+countdown-seconds: 5
+money-step-small: 10
+money-step-medium: 100
+money-step-large: 1000
