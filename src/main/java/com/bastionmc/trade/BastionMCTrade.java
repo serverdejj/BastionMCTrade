@@ -23,6 +23,8 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class BastionMCTrade extends JavaPlugin implements Listener {
     private final Map<UUID, Request> requests = new HashMap<>();
@@ -85,7 +87,58 @@ public final class BastionMCTrade extends JavaPlugin implements Listener {
         if (!file.exists()) saveResource("messages.yml", false);
         messages = YamlConfiguration.loadConfiguration(file);
     }
-    private String color(String s) { return ChatColor.translateAlternateColorCodes('&', s); }
+    // Admite colores tradicionales (&a), HEX (&#BFFFAF, #BFFFAF precedido por &),
+    // formato largo &x&B&F&F&F&A&F y degradados MiniMessage:
+    // <gradient:#BFFFAF:#33CCFF>Texto</gradient>.
+    private static final Pattern HEX = Pattern.compile("(?i)&#([0-9a-f]{6})");
+    private static final Pattern GRADIENT = Pattern.compile("(?is)<gradient:(#[0-9a-f]{6}):(#[0-9a-f]{6})>(.*?)</gradient>");
+
+    private String color(String source) {
+        if (source == null) return "";
+        String result = source;
+        Matcher gradient = GRADIENT.matcher(result);
+        StringBuffer gradients = new StringBuffer();
+        while (gradient.find()) {
+            String replacement = gradientText(gradient.group(3), gradient.group(1), gradient.group(2));
+            gradient.appendReplacement(gradients, Matcher.quoteReplacement(replacement));
+        }
+        gradient.appendTail(gradients);
+        result = gradients.toString();
+        Matcher hex = HEX.matcher(result);
+        StringBuffer colored = new StringBuffer();
+        while (hex.find()) {
+            hex.appendReplacement(colored, Matcher.quoteReplacement(hexColor(hex.group(1))));
+        }
+        hex.appendTail(colored);
+        return ChatColor.translateAlternateColorCodes('&', colored.toString());
+    }
+
+    private String hexColor(String hex) {
+        StringBuilder out = new StringBuilder("§x");
+        for (char c : hex.toCharArray()) out.append('§').append(Character.toLowerCase(c));
+        return out.toString();
+    }
+
+    private String gradientText(String value, String from, String to) {
+        int start = Integer.parseInt(from.substring(1), 16);
+        int end = Integer.parseInt(to.substring(1), 16);
+        int length = value.codePointCount(0, value.length());
+        StringBuilder out = new StringBuilder();
+        int index = 0;
+        for (int offset = 0; offset < value.length();) {
+            int cp = value.codePointAt(offset);
+            offset += Character.charCount(cp);
+            double t = length <= 1 ? 0 : index / (double)(length - 1);
+            int r = interpolate(start >> 16 & 255, end >> 16 & 255, t);
+            int g = interpolate(start >> 8 & 255, end >> 8 & 255, t);
+            int b = interpolate(start & 255, end & 255, t);
+            out.append(hexColor(String.format(Locale.ROOT, "%02x%02x%02x", r, g, b)));
+            out.appendCodePoint(cp);
+            index++;
+        }
+        return out.toString();
+    }
+    private int interpolate(int a, int b, double t) { return (int)Math.round(a + (b - a)*t); }
     private String message(String key, Object... replacements) {
         String value = messages.getString(key);
         if (value == null) value = "&c[Missing: " + key + "]";

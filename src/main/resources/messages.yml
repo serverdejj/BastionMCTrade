@@ -1,4 +1,5 @@
 # BASTION MC TRADE - Todos los colores usan &. Variables: %player%, %seconds%, %money%, %other_money%, %balance%, %amount%, %reason%.
+# Colores: &a, &#BFFFAF, &x&B&F&F&F&A&F y <gradient:#BFFFAF:#33CCFF>Texto</gradient>
 # Edita este archivo y ejecuta /bastiontrade reload.
 prefix: '&a&lBASTION TRADE &8» &r'
 only-players: '&cSolo jugadores.'
