@@ -1,0 +1,88 @@
+# BASTION MC TRADE - Todos los colores usan &. Variables: %player%, %seconds%, %money%, %other_money%, %balance%, %amount%, %reason%.
+# Edita este archivo y ejecuta /bastiontrade reload.
+prefix: '&a&lBASTION TRADE &8» &r'
+only-players: '&cSolo jugadores.'
+no-permission-admin: '&cNo tienes permiso para recargar el plugin.'
+reload-success: '&aConfiguración y mensajes recargados.'
+usage-interact: '&7Agáchate y haz clic derecho en otro jugador.'
+usage-command: '&cUsa /trade accept o /trade deny.'
+no-permission: '&cNo tienes permiso para intercambiar.'
+already-trading: '&cUno de ustedes ya está intercambiando.'
+too-far: '&cDebes estar cerca del otro jugador.'
+request-pending: '&eYa hay una invitación pendiente.'
+request-sent: '&aInvitación enviada a &f%player%&a.'
+request-received: '&f%player% &equiere intercambiar contigo. &7(%seconds% segundos)'
+request-expired-sender: '&eLa invitación a %player% ha caducado.'
+request-expired-target: '&eLa invitación de %player% ha caducado.'
+request-accept-button: '&a&l[ACEPTAR]'
+request-deny-button: '&c&l[RECHAZAR]'
+no-request: '&cNo tienes invitaciones válidas.'
+unable-to-start: '&cYa no pueden iniciar el intercambio (distancia o jugador ocupado).'
+trade-started: '&aIntercambio iniciado con &f%player%.'
+request-denied: '&cRechazaste el intercambio.'
+request-denied-sender: '&c%player% rechazó tu intercambio.'
+offer-full: '&cTu oferta está llena.'
+no-economy: '&cVault no tiene un plugin de economía conectado.'
+not-enough-money: '&cNo tienes suficiente dinero.'
+cursor-not-empty: '&cDeja libre el cursor para retirar objetos.'
+offer-no-balance: '&cAlguien ya no tiene el saldo ofrecido.'
+trade-completed: '&a&l¡INTERCAMBIO COMPLETADO! &7El intercambio finalizó.'
+trade-cancelled: '&c%reason% &7Tus objetos fueron devueltos.'
+cancel-server-stop: 'El servidor está reiniciándose.'
+cancel-by-player: 'Uno de los jugadores canceló el intercambio.'
+cancel-distance: 'Se alejaron demasiado o un jugador se desconectó.'
+cancel-no-balance: 'No hay saldo suficiente para completar el intercambio.'
+cancel-withdraw: 'No se pudo retirar el dinero ofrecido.'
+cancel-economy-error: 'Error del proveedor de economía. Contacta con un administrador.'
+cancel-closed: 'Un jugador cerró el menú.'
+cancel-disconnect: 'Un jugador se desconectó.'
+balance-unavailable: 'No disponible'
+
+menu:
+  trade-title: '&2&lBASTION &8» &aIntercambio'
+  money-title: '&2&lBASTION &8» &6Dinero'
+  separator:
+    name: '&8│'
+  filler:
+    name: '&8 '
+  accept:
+    name: '&a&lACEPTAR'
+    lore:
+      - '&7Pulsa para confirmar tu oferta.'
+  accepted:
+    name: '&a&lACEPTADO'
+    lore:
+      - '&7Esperando al otro jugador.'
+  cancel:
+    name: '&c&lCANCELAR'
+    lore:
+      - '&7Recuperas todos tus objetos.'
+  money-offer:
+    name: '&e&lDINERO: $%money%'
+    lore:
+      - '&7Clic para modificar la oferta.'
+      - '&7Dinero rival: &f$%other_money%'
+  countdown:
+    name: '&e&lCONFIRMANDO: %seconds%s'
+    lore:
+      - '&7No se pueden modificar ofertas.'
+  rival-accepted:
+    name: '&aEl otro jugador aceptó'
+    lore:
+      - '&7Ambos deben aceptar.'
+  waiting:
+    name: '&eEsperando confirmaciones'
+    lore:
+      - '&7Ambos deben aceptar.'
+  subtract-money:
+    name: '&c- $%amount%'
+  add-money:
+    name: '&a+ $%amount%'
+  money-current:
+    name: '&e&lTU OFERTA: $%money%'
+    lore:
+      - '&7Saldo: $%balance%'
+  money-back:
+    name: '&eVolver'
+  money-confirm:
+    name: '&aConfirmar cantidad'

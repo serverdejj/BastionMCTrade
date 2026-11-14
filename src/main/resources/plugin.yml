@@ -1,5 +1,5 @@
 name: BastionMCTrade
-version: 1.0.0
+version: 1.1.0
 main: com.bastionmc.trade.BastionMCTrade
 api-version: '1.21'
 author: BASTION MC
@@ -8,8 +8,14 @@ description: Intercambios seguros de objetos y dinero entre jugadores
 commands:
   trade:
     description: Aceptar o rechazar invitaciones de tradeo
-    usage: /trade <accept|deny> [jugador]
+    usage: /trade <accept|deny|reload> [jugador]
+  bastiontrade:
+    description: Comando de administración y recarga
+    usage: /bastiontrade reload
 permissions:
   bastiontrade.use:
     description: Permite intercambiar objetos
     default: true
+  bastiontrade.admin:
+    description: Recargar la configuración de BastionMCTrade
+    default: op
