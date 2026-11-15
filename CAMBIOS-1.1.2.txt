@@ -1,0 +1,6 @@
+BastionMCTrade 1.1.2
+- Degradados con 2 o más colores, como <b><gradient:#63E787:#FFFFFF:#6FE763>TEXTO</gradient></b>.
+- Funciona en mensajes y menús de messages.yml.
+- Mantiene colores & y HEX.
+- Para usarlo, compilar JAR y reemplazar el anterior. Conservar messages.yml y config.yml.
+- /bastiontrade reload después de editar messages.yml.

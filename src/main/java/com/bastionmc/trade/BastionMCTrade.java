@@ -87,52 +87,67 @@ public final class BastionMCTrade extends JavaPlugin implements Listener {
         if (!file.exists()) saveResource("messages.yml", false);
         messages = YamlConfiguration.loadConfiguration(file);
     }
-    // Admite colores tradicionales (&a), HEX (&#BFFFAF, #BFFFAF precedido por &),
-    // formato largo &x&B&F&F&F&A&F y degradados MiniMessage:
-    // <gradient:#BFFFAF:#33CCFF>Texto</gradient>.
+    // Colores legacy, HEX y gradientes MiniMessage con 2 o más colores.
+    // También admite <b>...</b> y <bold>...</bold>, incluso envolviendo un gradient.
     private static final Pattern HEX = Pattern.compile("(?i)&#([0-9a-f]{6})");
-    private static final Pattern GRADIENT = Pattern.compile("(?is)<gradient:(#[0-9a-f]{6}):(#[0-9a-f]{6})>(.*?)</gradient>");
+    private static final Pattern GRADIENT = Pattern.compile("(?is)<gradient:((?:#[0-9a-f]{6}:)+#[0-9a-f]{6})>(.*?)</gradient>");
+    private static final Pattern BOLD_GRADIENT = Pattern.compile("(?is)<(?:b|bold)>\\s*(<gradient:(?:#[0-9a-f]{6}:)+#[0-9a-f]{6}>.*?</gradient>)\\s*</(?:b|bold)>");
 
     private String color(String source) {
         if (source == null) return "";
         String result = source;
+        // Procesa los gradientes con negrita antes de los gradientes normales:
+        // cada código HEX reinicia el estilo y por eso hay que reponer §l por carácter.
+        Matcher wrapped = BOLD_GRADIENT.matcher(result);
+        StringBuffer boldOut = new StringBuffer();
+        while (wrapped.find()) {
+            Matcher inner = GRADIENT.matcher(wrapped.group(1));
+            String replacement = inner.matches() ? gradientText(inner.group(2), inner.group(1).split(":"), true) : wrapped.group();
+            wrapped.appendReplacement(boldOut, Matcher.quoteReplacement(replacement));
+        }
+        wrapped.appendTail(boldOut);
+        result = boldOut.toString();
         Matcher gradient = GRADIENT.matcher(result);
         StringBuffer gradients = new StringBuffer();
         while (gradient.find()) {
-            String replacement = gradientText(gradient.group(3), gradient.group(1), gradient.group(2));
+            String replacement = gradientText(gradient.group(2), gradient.group(1).split(":"), false);
             gradient.appendReplacement(gradients, Matcher.quoteReplacement(replacement));
         }
         gradient.appendTail(gradients);
         result = gradients.toString();
+        // Negrita en texto normal. Cierre de estilo con reset.
+        result = result.replaceAll("(?i)<(?:b|bold)>", "§l").replaceAll("(?i)</(?:b|bold)>", "§r");
         Matcher hex = HEX.matcher(result);
         StringBuffer colored = new StringBuffer();
-        while (hex.find()) {
-            hex.appendReplacement(colored, Matcher.quoteReplacement(hexColor(hex.group(1))));
-        }
+        while (hex.find()) hex.appendReplacement(colored, Matcher.quoteReplacement(hexColor(hex.group(1))));
         hex.appendTail(colored);
         return ChatColor.translateAlternateColorCodes('&', colored.toString());
     }
 
     private String hexColor(String hex) {
         StringBuilder out = new StringBuilder("§x");
-        for (char c : hex.toCharArray()) out.append('§').append(Character.toLowerCase(c));
+        for (char c : hex.replace("#", "").toCharArray()) out.append('§').append(Character.toLowerCase(c));
         return out.toString();
     }
 
-    private String gradientText(String value, String from, String to) {
-        int start = Integer.parseInt(from.substring(1), 16);
-        int end = Integer.parseInt(to.substring(1), 16);
+    private String gradientText(String value, String[] stops, boolean bold) {
+        int[] colors = new int[stops.length];
+        for (int i = 0; i < stops.length; i++) colors[i] = Integer.parseInt(stops[i].substring(1), 16);
         int length = value.codePointCount(0, value.length());
         StringBuilder out = new StringBuilder();
         int index = 0;
         for (int offset = 0; offset < value.length();) {
             int cp = value.codePointAt(offset);
             offset += Character.charCount(cp);
-            double t = length <= 1 ? 0 : index / (double)(length - 1);
+            double scaled = length <= 1 ? 0 : index / (double) (length - 1) * (colors.length - 1);
+            int segment = Math.min((int) scaled, colors.length - 2);
+            double t = scaled - segment;
+            int start = colors[segment], end = colors[segment + 1];
             int r = interpolate(start >> 16 & 255, end >> 16 & 255, t);
             int g = interpolate(start >> 8 & 255, end >> 8 & 255, t);
             int b = interpolate(start & 255, end & 255, t);
             out.append(hexColor(String.format(Locale.ROOT, "%02x%02x%02x", r, g, b)));
+            if (bold) out.append("§l");
             out.appendCodePoint(cp);
             index++;
         }
