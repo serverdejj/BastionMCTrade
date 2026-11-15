@@ -1,0 +1,1 @@
+1.1.3: Botones de solicitud interactivos usan LegacyComponentSerializer para convertir colores HEX, gradientes y negritas a componentes Adventure sin perder ClickEvent.

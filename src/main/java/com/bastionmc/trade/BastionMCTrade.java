@@ -1,6 +1,7 @@
 package com.bastionmc.trade;
 
 import net.milkbowl.vault.economy.Economy;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -202,10 +203,16 @@ public final class BastionMCTrade extends JavaPlugin implements Listener {
         requests.put(target.getUniqueId(),request);
         msg(from,"request-sent","player",target.getName());
         msg(target,"request-received","player",from.getName(),"seconds",getConfig().getInt("request-seconds",30));
-        target.sendMessage(net.kyori.adventure.text.Component.text(color(message("request-accept-button")+" "))
-            .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/trade accept "+from.getName()))
-            .append(net.kyori.adventure.text.Component.text(color(message("request-deny-button")))
-                .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/trade deny "+from.getName()))));
+        // Los codigos § (incluidos HEX §x) deben deserializarse a componentes
+        // Adventure antes de aplicar los eventos de clic. Component.text(...) los
+        // mostraba como texto plano y descartaba los colores en estos botones.
+        net.kyori.adventure.text.Component acceptButton = LegacyComponentSerializer.legacySection()
+            .deserialize(color(message("request-accept-button")))
+            .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/trade accept " + from.getName()));
+        net.kyori.adventure.text.Component denyButton = LegacyComponentSerializer.legacySection()
+            .deserialize(color(message("request-deny-button")))
+            .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/trade deny " + from.getName()));
+        target.sendMessage(acceptButton.append(net.kyori.adventure.text.Component.text(" ")).append(denyButton));
         Bukkit.getScheduler().runTaskLater(this,()->{
             if (requests.remove(target.getUniqueId(),request)) {
                 msg(from,"request-expired-sender","player",target.getName());
